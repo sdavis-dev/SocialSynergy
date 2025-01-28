@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
         register_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // starts RegisterActivity
+                startActivity(new Intent(MainActivity.this, RegisterActivity.class));
             }
         });
 
