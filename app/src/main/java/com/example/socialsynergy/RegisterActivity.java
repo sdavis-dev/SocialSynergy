@@ -2,6 +2,7 @@ package com.example.socialsynergy;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -44,13 +46,18 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
-        // Actionbar and Title
-        ActionBar action_bar = getSupportActionBar();
-        action_bar.setTitle("Create Account");
 
-        // Back Button
-        action_bar.setDisplayHomeAsUpEnabled(true);
-        action_bar.setDisplayShowHomeEnabled(true);
+        // Set up Toolbar as ActionBar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Get SupportActionBar after setting the Toolbar
+        ActionBar action_bar = getSupportActionBar();
+        if (action_bar != null) {
+            action_bar.setTitle("Create Account");
+            action_bar.setDisplayHomeAsUpEnabled(true); // Enable back button
+            action_bar.setDisplayShowHomeEnabled(true);
+        }
 
         // Init
         email_et = findViewById(R.id.emailEt);
@@ -71,9 +78,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         progress_dialog = builder.create();
 
-        progress_dialog.show();
-
-
         // Handles Register Activity
         register_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,15 +85,16 @@ public class RegisterActivity extends AppCompatActivity {
                 // Input Email and Password
                 String email = email_et.getText().toString().trim();
                 String password = password_et.getText().toString().trim();
+
                 // Validate
-                if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     // Set Error and Focus to Email EditText
                     email_et.setError("Invalid Email");
-                    email_et.setFocusable(true);
+                    email_et.requestFocus();
                 } else if (password.length() < 6) {
                     // Set Error and Focus to Email EditText
                     password_et.setError("Password needs to be at least 6 characters long");
-                    password_et.setFocusable(true);
+                    password_et.requestFocus();
                 }
                 else {
                     registerUser(email, password); // Register the User
@@ -115,6 +120,9 @@ public class RegisterActivity extends AppCompatActivity {
                             // Sign in success, dismiss dialog and start register activity
                             progress_dialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(RegisterActivity.this, "Registered...\n"+user.getEmail(), Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
+                            finish();
                         } else {
                             // If sign in fails, display a message to the user.
                             progress_dialog.dismiss();
